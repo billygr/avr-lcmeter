@@ -13,11 +13,8 @@
 #define LCD_DATA3_PIN    3            /**< pin for 4bit data bit 3  */
 #define LCD_RS_PORT      LCD_PORT     /**< port for RS line         */
 #define LCD_RS_PIN       5            /**< pin  for RS line         */
-#define LCD_RW_PORT      LCD_PORT     /**< port for RW line         */
-#define LCD_RW_PIN       10           /**< pin  for RW line (unused)*/
 #define LCD_E_PORT       LCD_PORT     /**< port for Enable line     */
 #define LCD_E_PIN        4            /**< pin  for Enable line     */
-
 
 #define LCD_LINES           2     /**< number of visible lines of the display */
 #define LCD_DISP_LENGTH    16     /**< visibles characters per line of the display */
@@ -72,8 +69,6 @@
 /* function set: set interface data length and number of display lines */
 #define LCD_FUNCTION_4BIT_1LINE  0x20   /* 4-bit interface, single line, 5x7 dots */
 #define LCD_FUNCTION_4BIT_2LINES 0x28   /* 4-bit interface, dual line,   5x7 dots */
-#define LCD_FUNCTION_8BIT_1LINE  0x30   /* 8-bit interface, single line, 5x7 dots */
-#define LCD_FUNCTION_8BIT_2LINES 0x38   /* 8-bit interface, dual line,   5x7 dots */
 
 #define LCD_MODE_DEFAULT     ((1<<LCD_ENTRY_MODE) | (1<<LCD_ENTRY_INC) )
 
@@ -86,7 +81,7 @@ void lcd_write(unsigned int data,unsigned int rs);
 void lcd_init(unsigned int dispAttr);
 void lcd_puts(const char *s);
 void lcd_putc(char c);
-unsigned int lcd_waitbusy();
+void lcd_waitbusy();
 void lcd_puts_p(const char *progmem_s);
 void lcd_gotoxy(unsigned int x, unsigned int y);
 

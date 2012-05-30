@@ -12,14 +12,8 @@
 #define lcd_e_low()     LCD_E_PORT  &= ~_BV(LCD_E_PIN);
 #define lcd_rs_high()   LCD_RS_PORT |=  _BV(LCD_RS_PIN)
 #define lcd_rs_low()    LCD_RS_PORT &= ~_BV(LCD_RS_PIN)
-#define lcd_rw_high()   LCD_RW_PORT |=  _BV(LCD_RW_PIN)
-#define lcd_rw_low()    LCD_RW_PORT &= ~_BV(LCD_RW_PIN)
 
-#if LCD_LINES==1
-#define LCD_FUNCTION_DEFAULT    LCD_FUNCTION_4BIT_1LINE
-#else
 #define LCD_FUNCTION_DEFAULT    LCD_FUNCTION_4BIT_2LINES
-#endif
 
 void toggle_e()
 {
@@ -34,10 +28,9 @@ void lcd_command(unsigned int cmd)
 	lcd_write(cmd, 0);
 }
 
-unsigned int lcd_waitbusy()
+void lcd_waitbusy()
 {
 	_delay_ms(10);
-	return 0;
 }
 
 void lcd_clrscr(void)
@@ -55,7 +48,7 @@ void lcd_write(unsigned int data, unsigned int rs)
 		lcd_rs_low();
 	}
 
-	//lcd_rw_low();
+        /* RW is tied to ground no need to assert it low */
 
 	/* configure data pins as output */
 	DDR(LCD_DATA0_PORT) |= 0x0F;
@@ -71,7 +64,6 @@ void lcd_write(unsigned int data, unsigned int rs)
 
 	/* all data pins high (inactive) */
 	LCD_DATA0_PORT = dataBits | 0x0F;
-
 }
 
 void lcd_init(unsigned int dispAttr)
@@ -104,7 +96,6 @@ void lcd_init(unsigned int dispAttr)
 	lcd_clrscr();		/* display clear                */
 	lcd_command(LCD_MODE_DEFAULT);	/* set entry mode               */
 	lcd_command(dispAttr);	/* display/cursor control       */
-
 }
 
 void lcd_puts(const char *s)
@@ -114,7 +105,6 @@ void lcd_puts(const char *s)
 	while ((c = *s++)) {
 		lcd_putc(c);
 	}
-
 }
 
 void lcd_puts_p(const char *progmem_s)
@@ -124,7 +114,6 @@ void lcd_puts_p(const char *progmem_s)
 	while ((c = pgm_read_byte(progmem_s++))) {
 		lcd_putc(c);
 	}
-
 }
 
 void lcd_putc(char c)
@@ -135,24 +124,8 @@ void lcd_putc(char c)
 
 void lcd_gotoxy(unsigned int x, unsigned int y)
 {
-#if LCD_LINES==1
-	lcd_command((1 << LCD_DDRAM) + LCD_START_LINE1 + x);
-#endif
-#if LCD_LINES==2
 	if (y == 0)
 		lcd_command((1 << LCD_DDRAM) + LCD_START_LINE1 + x);
 	else
 		lcd_command((1 << LCD_DDRAM) + LCD_START_LINE2 + x);
-#endif
-#if LCD_LINES==4
-	if (y == 0)
-		lcd_command((1 << LCD_DDRAM) + LCD_START_LINE1 + x);
-	else if (y == 1)
-		lcd_command((1 << LCD_DDRAM) + LCD_START_LINE2 + x);
-	else if (y == 2)
-		lcd_command((1 << LCD_DDRAM) + LCD_START_LINE3 + x);
-	else			/* y==3 */
-		lcd_command((1 << LCD_DDRAM) + LCD_START_LINE4 + x);
-#endif
-
 }
