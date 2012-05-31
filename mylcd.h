@@ -74,14 +74,14 @@
 
 #define lcd_puts_P(__s)         lcd_puts_p(PSTR(__s))
 
-void toggle_e();
+void toggle_e(void);
 void lcd_command(unsigned int cmd);
 void lcd_clrscr(void);
 void lcd_write(unsigned int data,unsigned int rs);
 void lcd_init(unsigned int dispAttr);
 void lcd_puts(const char *s);
 void lcd_putc(char c);
-void lcd_waitbusy();
+void lcd_waitbusy(void);
 void lcd_puts_p(const char *progmem_s);
 void lcd_gotoxy(unsigned int x, unsigned int y);
 

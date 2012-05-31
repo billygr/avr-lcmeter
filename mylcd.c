@@ -30,10 +30,10 @@ void lcd_command(unsigned int cmd)
 
 void lcd_waitbusy()
 {
-	_delay_ms(10);
+	_delay_ms(5);
 }
 
-void lcd_clrscr(void)
+void lcd_clrscr()
 {
 	lcd_command(1 << LCD_CLR);
 }
