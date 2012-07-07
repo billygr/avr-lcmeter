@@ -1,4 +1,10 @@
-#define F_CPU 16000000UL
+/* LCD Library
+   Based on flury
+*/
+
+#ifndef F_CPU
+#warning "F_CPU not defined"
+#endif
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
@@ -48,7 +54,7 @@ void lcd_write(unsigned int data, unsigned int rs)
 		lcd_rs_low();
 	}
 
-        /* RW is tied to ground no need to assert it low */
+	/* RW is tied to ground no need to assert it low */
 
 	/* configure data pins as output */
 	DDR(LCD_DATA0_PORT) |= 0x0F;

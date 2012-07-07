@@ -3,7 +3,7 @@ OBJ            = avrlcmeter.o mylcd.o
 MCU_TARGET     = atmega168
 OPTIMIZE       = -O2
 
-DEFS           =
+DEFS           = -DF_CPU=16000000UL
 LIBS           =
 
 # You should not have to change anything below here.
@@ -12,7 +12,7 @@ CC             = avr-gcc
 
 # Override is only needed by avr-lib build system.
 
-override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
+override CFLAGS        = -g -Wall -Wstrict-prototypes $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 override LDFLAGS       = -Wl,-Map,$(PRG).map
 
 OBJCOPY        = avr-objcopy
