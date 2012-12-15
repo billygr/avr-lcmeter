@@ -1,4 +1,6 @@
-#define F_CPU 16000000UL
+#ifndef F_CPU
+#warning "F_CPU not defined"
+#endif
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -8,6 +10,7 @@
 #include <avr/pgmspace.h>
 #include "avrlcmeter.h"
 #include "mylcd.h"
+#include "version.h"
 
 volatile unsigned char freq_24 = 0;
 volatile unsigned int freq_count_16 = 0;
@@ -67,11 +70,18 @@ int main(void)
 
 	/* Setup hardware       */
 	DDRB = 0xFF;
-	/* enable internal pull up      */
+
+	/* enable internal pull up for the input switches     */
 	PORTB |= _BV(LCSWITCH);
+
+        cbi(DDRB, 0); // pushbutton zeroing
+        sbi(PORTB, 0); // pullup on zero pushbutton
+
 
 	/* Set REEDLRELAY as output     */
 	sbi(DDRB, REEDRELAY);
+
+        /* Switch it off, just in case  */
 	relay_off();
 
 	/* initialize display, cursor off */
@@ -82,6 +92,8 @@ int main(void)
 
 	/* put string to display */
 	lcd_puts_P("AVR L/C Meter");
+	lcd_gotoxy(0, 1);
+	lcd_puts(Version);
 
 	/* Switch to C position in order to start the calibration process       */
 
@@ -98,13 +110,13 @@ int main(void)
 	_delay_ms(1000);
 	F1 = running;
 	relay_on();
-	_delay_ms(2000);	// stabilize
+	_delay_ms(1000);	// Wait 1 seconds to stabilize
 	F2 = running;		// get test frequency
 	relay_off();
 
 	lcd_clrscr();
 
-	/* Calculate the residance Cs/Ls        */
+	/* Calculate the residance Cs/Ls stray Inductance and Capacitance       */
 	/* Cs = (F2^2 / (F1^2-F2^2))*C1value)     */
 	Cs = square(F2 * 5) / ((square(F1 * 5) - square(F2 * 5))) * .000000001;
 	Ls = 1 / (4 * square(M_PI) * square(F1 * 5) * Cs);
@@ -115,10 +127,9 @@ int main(void)
 		if (bit_is_clear(PINB, LCSWITCH)) {
 			if (running < 3) {
 				lcd_gotoxy(0, 0);
-				lcd_puts_P
-				    ("Not an inductor                 \r");
+				lcd_puts_P("Not an inductor ");
 			} else {
-				/* Inducantce mode      */
+				/* Inductor mode      */
 				lcd_gotoxy(0, 1);
 				dtostrf(Ftest, 5, 0, test);
 				lcd_puts(test);
@@ -144,10 +155,12 @@ int main(void)
 					lcd_puts("nH");
 				}
 			}
+		_delay_ms(1000);
+		lcd_clrscr();
 		}
 
 		if (bit_is_set(PINB, LCSWITCH)) {
-			/* Capaticance mode     */
+			/* Capacitor mode     */
 			lcd_gotoxy(0, 1);
 			dtostrf(Ftest, 5, 0, test);
 			lcd_puts(test);
@@ -169,16 +182,31 @@ int main(void)
 				dtostrf(Ct * 1000000000, 6, 3, test);
 				lcd_puts(test);
 				lcd_puts("nF");
-			} else {
+			} else if (Ct <=0) {
+                                lcd_puts_P("      ");
+                                lcd_puts("pF");
+                        } else {
 /* Need to prevent this warning warning: integer constant is too large for ‘long’ type  */
-
 				dtostrf(Ct * 1000000000000, 6, 0, test);
 				lcd_puts(test);
 				lcd_puts("pF");
 			}
-		}
+		//_delay_ms(1000);
+		//lcd_clrscr();
+
+                if(bit_is_clear(PINB, 0)) {
+                        lcd_gotoxy(0,0);
+                        lcd_puts_P("zeroed                \r");
+                        F1 = running;
+                }
+                while(bit_is_clear(PINB, 0)) {
+                        // do nothing till the user lets go of the zero button
+                }
+
 		_delay_ms(1000);
 		lcd_clrscr();
+
+		}
 	}
 
 	return 0;

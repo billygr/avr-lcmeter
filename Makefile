@@ -1,5 +1,5 @@
 PRG            = avrlcmeter
-OBJ            = avrlcmeter.o mylcd.o
+OBJ            = avrlcmeter.o mylcd.o version.o
 MCU_TARGET     = atmega168
 OPTIMIZE       = -O2
 
@@ -93,3 +93,10 @@ pdf: $(PRG).pdf
 %.png: %.fig
 	$(FIG2DEV) -L png $< $@
 
+version.c: 
+	echo '#include "version.h"' > $@
+	echo -n 'char *Version = "ver: ' >> $@
+	date +'%Y%m%d.%H%M";' >> $@;
+
+# Always compile version.c to get correct compilation date and time 
+.PHONY:   version.c 

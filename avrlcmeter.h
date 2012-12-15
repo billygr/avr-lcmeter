@@ -6,5 +6,6 @@
 
 #define REEDRELAY       PB2
 #define LCSWITCH        PB1
+#define ZEROSWITCH      PB0
 
 #endif
