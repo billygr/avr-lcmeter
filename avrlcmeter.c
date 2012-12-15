@@ -54,7 +54,8 @@ ISR(TIMER1_OVF_vect)
 
 int main(void)
 {
-	char test[20];
+	// Temporary string for double to string conversion
+	char tmpstring[16];
 
 	// set up the 16 bit timer as an external frequency counter:
 	TCCR1B |= (1 << CS10) | (1 << CS11) | (1 << CS12);	// External clock, rising edge
@@ -76,7 +77,6 @@ int main(void)
 
         cbi(DDRB, 0); // pushbutton zeroing
         sbi(PORTB, 0); // pullup on zero pushbutton
-
 
 	/* Set REEDLRELAY as output     */
 	sbi(DDRB, REEDRELAY);
@@ -131,8 +131,8 @@ int main(void)
 			} else {
 				/* Inductor mode      */
 				lcd_gotoxy(0, 1);
-				dtostrf(Ftest, 5, 0, test);
-				lcd_puts(test);
+				dtostrf(Ftest, 5, 0, tmpstring);
+				lcd_puts(tmpstring);
 				lcd_puts("Hz");
 				Lt = (square(F1 * 5) / (square(running * 5)) -
 				      1) * Ls;
@@ -140,18 +140,18 @@ int main(void)
 				lcd_puts("Lx: ");
 
 				if (Lt > .0001) {
-					dtostrf(Lt * 1000, 6, 3, test);
-					lcd_puts(test);
+					dtostrf(Lt * 1000, 6, 3, tmpstring);
+					lcd_puts(tmpstring);
 					lcd_puts("mH");
 				}
 
 				else if (Lt > .0000001) {
-					dtostrf(Lt * 1000000, 6, 3, test);
-					lcd_puts(test);
+					dtostrf(Lt * 1000000, 6, 3, tmpstring);
+					lcd_puts(tmpstring);
 					lcd_puts("uH");
 				} else {
-					dtostrf(Lt * 1000000000, 6, 3, test);
-					lcd_puts(test);
+					dtostrf(Lt * 1000000000, 6, 3, tmpstring);
+					lcd_puts(tmpstring);
 					lcd_puts("nH");
 				}
 			}
@@ -162,8 +162,8 @@ int main(void)
 		if (bit_is_set(PINB, LCSWITCH)) {
 			/* Capacitor mode     */
 			lcd_gotoxy(0, 1);
-			dtostrf(Ftest, 5, 0, test);
-			lcd_puts(test);
+			dtostrf(Ftest, 5, 0, tmpstring);
+			lcd_puts(tmpstring);
 			lcd_puts("Hz");
 
 			Ct = (square(F1 * 5) / (square(running * 5)) - 1) * Cs;
@@ -171,35 +171,35 @@ int main(void)
 			lcd_puts("Cx: ");
 
 			if (Ct > .0001) {
-				dtostrf(Ct * 1000, 6, 3, test);
-				lcd_puts(test);
+				dtostrf(Ct * 1000, 6, 3, tmpstring);
+				lcd_puts(tmpstring);
 				lcd_puts("mF");
 			} else if (Ct > .0000001) {
-				dtostrf(Ct * 1000000, 6, 3, test);
-				lcd_puts(test);
+				dtostrf(Ct * 1000000, 6, 3, tmpstring);
+				lcd_puts(tmpstring);
 				lcd_puts("uF");
 			} else if (Ct > .0000000001) {
-				dtostrf(Ct * 1000000000, 6, 3, test);
-				lcd_puts(test);
+				dtostrf(Ct * 1000000000, 6, 3, tmpstring);
+				lcd_puts(tmpstring);
 				lcd_puts("nF");
 			} else if (Ct <=0) {
                                 lcd_puts_P("      ");
                                 lcd_puts("pF");
                         } else {
 /* Need to prevent this warning warning: integer constant is too large for ‘long’ type  */
-				dtostrf(Ct * 1000000000000, 6, 0, test);
-				lcd_puts(test);
+				dtostrf(Ct * 1000000000000, 6, 0, tmpstring);
+				lcd_puts(tmpstring);
 				lcd_puts("pF");
 			}
 		//_delay_ms(1000);
 		//lcd_clrscr();
 
-                if(bit_is_clear(PINB, 0)) {
+                if(bit_is_clear(PINB, ZEROSWITCH)) {
                         lcd_gotoxy(0,0);
                         lcd_puts_P("zeroed                \r");
                         F1 = running;
                 }
-                while(bit_is_clear(PINB, 0)) {
+                while(bit_is_clear(PINB, ZEROSWITCH)) {
                         // do nothing till the user lets go of the zero button
                 }
 
