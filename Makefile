@@ -98,7 +98,7 @@ pdf: $(PRG).pdf
 
 version.c: 
 	echo '#include "version.h"' > $@
-	echo -n 'char *Version = "ver: ' >> $@
+	echo 'char *Version = "ver: \c' >> $@
 	date +'%Y%m%d.%H%M";' >> $@;
 
 # Always compile version.c to get correct compilation date and time 

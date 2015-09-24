@@ -74,6 +74,7 @@ int main(void)
 
 	/* enable internal pull up for the input switches     */
 	PORTB |= _BV(LCSWITCH);
+	PORTB |= _BV(ZEROSWITCH);
 
         cbi(DDRB, 0); // pushbutton zeroing
         sbi(PORTB, 0); // pullup on zero pushbutton
